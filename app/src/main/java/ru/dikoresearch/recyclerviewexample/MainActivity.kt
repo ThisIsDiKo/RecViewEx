@@ -3,6 +3,7 @@ package ru.dikoresearch.recyclerviewexample
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import ru.dikoresearch.recyclerviewexample.databinding.ActivityMainBinding
 import ru.dikoresearch.recyclerviewexample.model.User
@@ -34,12 +35,19 @@ class MainActivity : AppCompatActivity() {
             override fun onUserDetails(user: User) {
                 Toast.makeText(this@MainActivity, "User: ${user.name}", Toast.LENGTH_SHORT).show()
             }
+
+            override fun onUserFire(user: User) {
+                usersService.fireUser(user)
+            }
         })
 
         val layoutManager = LinearLayoutManager(this)
         binding.recyclerView.layoutManager = layoutManager
         binding.recyclerView.adapter = adapter
-
+        val itemAnimator = binding.recyclerView.itemAnimator
+        if (itemAnimator is DefaultItemAnimator){
+            itemAnimator.supportsChangeAnimations = false
+        }
         usersService.addListener(usersListener)
     }
 

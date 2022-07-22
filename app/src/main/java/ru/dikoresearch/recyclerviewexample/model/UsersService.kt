@@ -2,6 +2,7 @@ package ru.dikoresearch.recyclerviewexample.model
 
 import com.github.javafaker.Faker
 import java.util.*
+import kotlin.collections.ArrayList
 
 typealias UsersListener = (users: List<User>) -> Unit
 
@@ -32,6 +33,7 @@ class UsersService {
             it.id == user.id
         }
         if (indexToDelete != -1){
+            users = ArrayList(users)
             users.removeAt(indexToDelete)
             notifyChanges()
         }
@@ -42,6 +44,7 @@ class UsersService {
         if (oldIndex == -1) return
         val newIndex = oldIndex + moveBy
         if (newIndex < 0 || newIndex >= users.size) return
+        users = ArrayList(users)
         Collections.swap(users, oldIndex, newIndex)
         notifyChanges()
     }
@@ -53,6 +56,18 @@ class UsersService {
 
     fun removeListener(listener: UsersListener){
         listeners.remove(listener)
+    }
+
+    fun fireUser(user: User){
+        val index = users.indexOfFirst{
+            it.id == user.id
+        }
+        if (index != -1){
+            val updatedUser = users[index].copy(company = "")
+            users = ArrayList(users)
+            users[index] = updatedUser
+            notifyChanges()
+        }
     }
 
     private fun notifyChanges(){
