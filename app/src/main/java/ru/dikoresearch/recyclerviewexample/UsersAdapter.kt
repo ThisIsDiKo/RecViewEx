@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.dikoresearch.recyclerviewexample.databinding.ItemUserBinding
 import ru.dikoresearch.recyclerviewexample.model.User
+import ru.dikoresearch.recyclerviewexample.screens.UserListItem
 
 interface UserActionListener {
 
@@ -26,8 +27,8 @@ interface UserActionListener {
 }
 
 class UsersDiffCallback(
-    private val oldList: List<User>,
-    private val newList: List<User>
+    private val oldList: List<UserListItem>,
+    private val newList: List<UserListItem>
 ): DiffUtil.Callback(){
     override fun getOldListSize(): Int = oldList.size
 
@@ -36,7 +37,7 @@ class UsersDiffCallback(
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         val oldUser = oldList[oldItemPosition]
         val newUser = newList[newItemPosition]
-        return oldUser.id == newUser.id
+        return oldUser.user.id == newUser.user.id
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
@@ -51,7 +52,7 @@ class UsersAdapter(
     private val actionListener: UserActionListener
 ) : RecyclerView.Adapter<UsersAdapter.UsersViewHolder>(), View.OnClickListener {
 
-    var users: List<User> = emptyList()
+    var users: List<UserListItem> = emptyList()
         set(newValue) {
             val diffCallback = UsersDiffCallback(field, newValue)
             val diffResult = DiffUtil.calculateDiff(diffCallback)
@@ -93,13 +94,25 @@ class UsersAdapter(
     }
 
     override fun onBindViewHolder(holder: UsersViewHolder, position: Int) {
-        val user = users[position]
+        val userListItem = users[position]
+        val user = userListItem.user
+
         with(holder.binding) {
             holder.itemView.tag = user
             moreImageViewButton.tag = user
 
+            if (userListItem.isInProgress) {
+                moreImageViewButton.visibility = View.INVISIBLE
+                itemProgressBar.visibility = View.VISIBLE
+                holder.binding.root.setOnClickListener(null)
+            } else {
+                moreImageViewButton.visibility = View.VISIBLE
+                itemProgressBar.visibility = View.GONE
+                holder.binding.root.setOnClickListener(this@UsersAdapter)
+            }
+
             userNameTextView.text = user.name
-            userCompanyTextView.text = if (user.company.isNotBlank()) user.company else "[ Unemployed ]"
+            userCompanyTextView.text = user.company
             if (user.photo.isNotBlank()) {
                 Glide.with(photoImageView.context)
                     .load(user.photo)
@@ -122,7 +135,7 @@ class UsersAdapter(
         val popupMenu = PopupMenu(view.context, view)
         val context = view.context
         val user = view.tag as User
-        val position = users.indexOfFirst { it.id == user.id }
+        val position = users.indexOfFirst { it.user.id == user.id }
 
         popupMenu.menu.add(0, ID_MOVE_UP, Menu.NONE, context.getString(R.string.move_up)).apply {
             isEnabled = position > 0

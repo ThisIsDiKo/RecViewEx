@@ -4,4 +4,14 @@
     <string name="move_up">Move up</string>
     <string name="move_down">Move down</string>
     <string name="remove">Remove</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="failed_to_load_users">failed to load users</string>
+    <string name="try_again">Try again</string>
+    <string name="no_users">No users</string>
+    <string name="cant_move_user">Can\'t move user</string>
+    <string name="cant_delete_user">Can\'t delete user</string>
+    <string name="cant_fire_user">Can\'t fire user</string>
+    <string name="cant_load_user_details">Can\'t load user details</string>
+    <string name="user_has_been_deleted">User deleted</string>
 </resources>
